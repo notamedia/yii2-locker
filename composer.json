@@ -1,0 +1,29 @@
+{
+  "name": "notamedia/yii2-locker",
+  "description": "Yii2 Locker Extension",
+  "keywords": ["yii2", "lock", "locker"],
+  "type": "yii2-extension",
+  "authors": [
+    {
+      "name": "Alexey Stepankov",
+      "email": "xeurun@yahoo.com"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/notamedia/yii2-locker/issues",
+    "source": "https://github.com/notamedia/yii2-locker"
+  },
+  "require": {
+    "php": ">=5.6.0",
+    "yiisoft/yii2": "~2.0.0"
+  },
+  "require-dev": {
+    "guzzlehttp/guzzle": "<7.0",
+    "codeception/base": "2.3.*",
+    "codeception/verify": "0.3.*",
+    "codeception/specify": "0.4.*"
+  },
+  "autoload": {
+    "psr-4": { "notamedia\\locker\\": "src" }
+  }
+}
