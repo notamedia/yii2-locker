@@ -13,7 +13,11 @@ class LockAnotherUserException extends Exception
     protected $userId;
 
     /**
-     * @inheritdoc
+     * Construct the exception. Note: The message is NOT binary safe.
+     * @param integer $userId locked user id
+     * @param string $message [optional] The Exception message to throw.
+     * @param int $code [optional] The Exception code.
+     * @param \Exception $previous [optional] The previous throwable used for the exception chaining.
      */
     public function __construct(
         $userId,

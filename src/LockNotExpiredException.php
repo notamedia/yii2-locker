@@ -13,7 +13,11 @@ class LockNotExpiredException extends Exception
     protected $seconds;
 
     /**
-     * @inheritdoc
+     * Construct the exception. Note: The message is NOT binary safe.
+     * @param integer $seconds seconds to expired lock
+     * @param string $message [optional] The Exception message to throw.
+     * @param int $code [optional] The Exception code.
+     * @param \Exception $previous [optional] The previous throwable used for the exception chaining.
      */
     public function __construct(
         $seconds,
