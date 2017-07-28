@@ -1,0 +1,13 @@
+# IDE
+nbproject
+.idea
+
+# Tests
+tests/_support/_generated
+
+# Vendor
+vendor
+
+# Composer
+composer.phar
+composer.lock

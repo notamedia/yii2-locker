@@ -1,0 +1,30 @@
+paths:
+    tests: tests
+    output: tests/_output
+    support: tests/_support
+    data: tests
+settings:
+    lint: true
+    colors: true
+    shuffle: true
+    bootstrap: bootstrap.php
+suites:
+    unit:
+        path: .
+        actor: UnitTester
+        modules:
+            enabled:
+                - Db
+                - Yii2
+                - Asserts
+                - tests\_support\Helper\Unit
+            config:
+                Db:
+                  dsn: 'sqlite:tests/_output/db.sq3'
+                  user: ''
+                  password: ''
+                  dump: 'tests/_data/dump.sql'
+                  cleanup: true
+                Yii2:
+                  cleanup: true
+                  configFile: 'tests/unit/config.php'
