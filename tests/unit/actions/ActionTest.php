@@ -16,7 +16,7 @@ class ActionTest extends \Codeception\Test\Unit
         parent::_before();
 
         /** @var \yii\db\Migration $migration */
-        $migration = \Yii::createObject(\notamedia\locker\m000000_000000_create_table_lock::class);
+        $migration = \Yii::createObject(\notamedia\locker\migrations\m000000_000000_create_table_lock::class);
         $migration->up();
 
         $this->tester->haveFixtures([
@@ -52,14 +52,16 @@ class ActionTest extends \Codeception\Test\Unit
 
         $lock = Lock::findOne(['hash' => $model->getLockHash()]);
         $this->assertEquals(1, $lock->locked_by, 'User set');
-        $expression = new \yii\db\Expression(
-            'TIMESTAMPDIFF(SECOND, NOW(), :lockedAt)',
-            [':lockedAt' => $lock->locked_at]
+        $diffExpression = new \yii\db\Expression(
+            'CAST(strftime([[locked_at]], CURRENT_TIMESTAMP) as integer)'
         );
-        $dateDiff = (new \yii\db\Query())->select($expression)->scalar();
+        $diffSeconds = Lock::find()
+            ->select($diffExpression)
+            ->where(['hash' => $lock->getAttribute('hash')])
+            ->scalar();
         $this->assertGreaterThanOrEqual(
             \Yii::$app->lockManager->lockTime['default'],
-            $dateDiff,
+            $diffSeconds,
             'Lock time is correct'
         );
         $this->assertFalse(

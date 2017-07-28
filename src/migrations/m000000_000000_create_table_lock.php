@@ -1,6 +1,6 @@
 <?php
 
-namespace notamedia\locker;
+namespace notamedia\locker\migrations;
 
 /**
  * Migration for create needed table.

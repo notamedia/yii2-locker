@@ -16,7 +16,7 @@ class LockControlFilterTest extends \Codeception\Test\Unit
         parent::_before();
 
         /** @var \yii\db\Migration $migration */
-        $migration = \Yii::createObject(\notamedia\locker\m000000_000000_create_table_lock::class);
+        $migration = \Yii::createObject(\notamedia\locker\migrations\m000000_000000_create_table_lock::class);
         $migration->up();
 
         $this->tester->haveFixtures([

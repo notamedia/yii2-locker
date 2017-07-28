@@ -31,8 +31,8 @@ class LockManager extends Component implements LockManagerInterface
     public $lockTime = [
         self::DEFAULT_LOCK_TIME_KEY => 900 // 15 minutes
     ];
-    /** @var string expression for add seconds to current date, where :time is a needed seconds */
-    public $initTimeExpressionValue = 'DATE_ADD(NOW(), INTERVAL :time SECOND)';
+    /** @var string expression for add seconds to current date, where %s is a needed seconds */
+    public $initTimeExpressionValue = 'DATE_ADD(NOW(), INTERVAL %s SECOND)';
     /** @var string expression for getting past time */
     public $diffExpressionValue = 'TIMESTAMPDIFF(SECOND, NOW(), [[locked_at]])';
     /** @var string|int user ID (see [[\yii\web\User::id]]) */
@@ -71,16 +71,12 @@ class LockManager extends Component implements LockManagerInterface
         $lock->setAttributes([
             'locked_by' => $this->_userId,
             'locked_at' => new Expression(
-                $this->initTimeExpressionValue,
-                [':time' => $lockSeconds]
+                sprintf($this->initTimeExpressionValue, $lockSeconds)
             )
         ]);
 
         if (!$lock->save()) {
-            throw new LockException(
-                $lock->getErrors(),
-                'Failed to update the object'
-            );
+            throw new \RuntimeException('Failed to create or update the object');
         }
     }
     
@@ -97,10 +93,7 @@ class LockManager extends Component implements LockManagerInterface
         ]);
 
         if (!$lock->save()) {
-            throw new LockException(
-                $lock->getErrors(),
-                'Failed to update the object'
-            );
+            throw new \RuntimeException('Failed to update the object');
         }
     }
 

@@ -90,7 +90,7 @@ return [
 
 * Note: you may set `'lockManager' = '...'` attribute if your LockManager component has other key
 
-connect and execute [migration](/src/m000000_000000_create_table_lock.php), example:
+connect and execute [migration](/src/migrations/m000000_000000_create_table_lock.php), example:
 
 For yii2 > 2.0.10
 
@@ -100,7 +100,7 @@ For yii2 > 2.0.10
     'migrate' => [
         'class' => MigrateController::class,
         'migrationNamespaces' => [
-            'notamedia\locker',
+            'notamedia\locker\migrations',
         ],
         //...
     ],
@@ -113,35 +113,3 @@ For yii2 < 2.0.10 create new migration and use extends
 ```php
 class mxxxxxx_xxxxxx_create_table_lock extends m000000_000000_create_table_lock
 ```
-
-Localization
-------------
-
-Add the following code in your application configuration:
-
-```php
-
-return [
-    //....
-    'components' => [
-        //....
-        'i18n' => [
-            'translations' => [
-                'notamedia/locker/*' => [
-                    'class' => PhpMessageSource::class,
-                    'basePath' => '@vendor/notamedia/yii2-locker/resources/messages',
-                    'sourceLanguage' => 'en',
-                    'fileMap' => [
-                        'notamedia/locker/labels' => 'labels.php',
-                        'notamedia/locker/errors' => 'errors.php',
-                    ],
-                ]
-            ],
-        ],
-        //....
-    ]
-    //....
-]
-```
-
-for translate exception message use custom error handler with `Yii::t`

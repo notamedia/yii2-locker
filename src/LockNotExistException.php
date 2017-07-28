@@ -2,21 +2,22 @@
 
 namespace notamedia\locker;
 
+use yii\base\Exception;
+
 /**
  * Represents an exception that is caused when resource lock not exists
  */
-class LockNotExistException extends LockException
+class LockNotExistException extends Exception
 {
     /**
      * @inheritdoc
      */
     public function __construct(
-        $data = null,
         $message = 'Resource is not blocked',
         $code = 0,
         \Exception $previous = null
     ) {
-        parent::__construct($data, $message, $code, $previous);
+        parent::__construct($message, $code, $previous);
     }
 
     /**

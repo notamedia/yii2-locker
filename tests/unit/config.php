@@ -33,15 +33,15 @@ return [
         ],
         'db' => [
             'class' => Connection::class,
-            'dsn' => 'mysql:host=127.0.0.1;dbname=yii2locker;port=3306',
-            'username' => 'root',
-            'password' => '1234',
+            'dsn' => 'sqlite:tests/_output/db.sq3',
         ],
         'lockManager' => [
             'class' => LockManager::class,
             'lockTime' => [
                 'default' => 900
-            ]
+            ],
+            'initTimeExpressionValue' => "date('now', '+%s second')",
+            'diffExpressionValue' => 'CAST(strftime([[locked_at]], CURRENT_TIMESTAMP) as integer)',
         ],
         'urlManager' => [
             'enablePrettyUrl'     => true,
