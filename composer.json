@@ -25,5 +25,8 @@
   },
   "autoload": {
     "psr-4": { "notamedia\\locker\\": "src" }
+  },
+  "extra": {
+    "bootstrap": "notamedia\\locker\\config\\Bootstrap"
   }
 }
