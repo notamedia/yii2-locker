@@ -35,8 +35,6 @@ class LockManager extends Component implements LockManagerInterface
     public $initTimeExpressionValue = 'DATE_ADD(NOW(), INTERVAL %s SECOND)';
     /** @var string expression for getting past time */
     public $diffExpressionValue = 'TIMESTAMPDIFF(SECOND, NOW(), [[locked_at]])';
-    /** @var string|int user ID (see [[\yii\web\User::id]]) */
-    private $_userId;
 
     /**
      * @throws InvalidConfigException
@@ -45,13 +43,8 @@ class LockManager extends Component implements LockManagerInterface
     {
         parent::init();
 
-        if (!\Yii::$app->getUser() || \Yii::$app->getUser()->getIsGuest()) {
-            throw new InvalidConfigException('Not found correct user component or user not authorized');
-        }
-
-        $this->_userId = \Yii::$app->getUser()->getId();
-        if (empty($this->_userId)) {
-            throw new InvalidConfigException('User identifier not correct');
+        if (!\Yii::$app->getUser()) {
+            throw new InvalidConfigException('Not found correct user component');
         }
 
         if (!is_array($this->lockTime) || !isset($this->lockTime[self::DEFAULT_LOCK_TIME_KEY])) {
@@ -69,7 +62,7 @@ class LockManager extends Component implements LockManagerInterface
 
         $lockSeconds = $this->getResourceLockTime($resource);
         $lock->setAttributes([
-            'locked_by' => $this->_userId,
+            'locked_by' => \Yii::$app->getUser()->getId(),
             'locked_at' => new Expression(
                 sprintf($this->initTimeExpressionValue, $lockSeconds)
             )
@@ -113,7 +106,7 @@ class LockManager extends Component implements LockManagerInterface
             $lock->setAttributes([
                 'hash'      => $hash,
                 'locked_at' => new Expression('NOW()'),
-                'locked_by' => $this->_userId
+                'locked_by' => \Yii::$app->getUser()->getId()
             ]);
         }
 
@@ -146,7 +139,7 @@ class LockManager extends Component implements LockManagerInterface
      */
     public function checkLockAuthor(Lock $lock, $throw = false)
     {
-        $active = $this->_userId !== $lock->locked_by;
+        $active = \Yii::$app->getUser()->getId() !== $lock->locked_by;
         if ($active && $throw) {
             throw new LockAnotherUserException($lock->locked_by);
         }
