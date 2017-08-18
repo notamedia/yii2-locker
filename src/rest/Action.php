@@ -45,6 +45,10 @@ abstract class Action extends yiirest\Action
             throw new MethodNotAllowedHttpException('Method not supported by the target resource');
         }
 
+        if ($this->checkAccess) {
+            call_user_func($this->checkAccess, $this->id, $model);
+        }
+
         $this->manage($model);
 
         \Yii::$app->getResponse()->setStatusCode(204);
