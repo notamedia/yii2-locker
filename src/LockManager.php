@@ -31,6 +31,8 @@ class LockManager extends Component implements LockManagerInterface
     public $lockTime = [
         self::DEFAULT_LOCK_TIME_KEY => 900 // 15 minutes
     ];
+    /** @var string lock model class */
+    public $lockClass = Lock::class;
     /** @var string expression for add seconds to current date, where %s is a needed seconds */
     public $initTimeExpressionValue = 'DATE_ADD(NOW(), INTERVAL %s SECOND)';
     /** @var string expression for getting past time */
@@ -57,60 +59,34 @@ class LockManager extends Component implements LockManagerInterface
      */
     public function activateLock(LockableInterface $resource)
     {
-        $lock = $this->getResourceLock($resource);
+        /** @var LockInterface $classLock */
+        $classLock = $this->lockClass;
+        $lock = $classLock::findOrCreate($resource);
         $this->checkLockAuthor($lock, true);
 
         $lockSeconds = $this->getResourceLockTime($resource);
-        $lock->setAttributes([
-            'locked_by' => \Yii::$app->getUser()->getId(),
-            'locked_at' => new Expression(
-                sprintf($this->initTimeExpressionValue, $lockSeconds)
-            )
-        ]);
+        $lock->activate(\Yii::$app->getUser(), new Expression(sprintf($this->initTimeExpressionValue, $lockSeconds)));
 
         if (!$lock->save()) {
             throw new \RuntimeException('Failed to create or update the object');
         }
     }
-    
+
     /**
      * @inheritdoc
      */
     public function deactivateLock(LockableInterface $resource)
     {
+        /** @var LockInterface $classLock */
+        $classLock = $this->lockClass;
+        
         $this->checkLockActual($resource, true);
 
-        $lock = $this->getResourceLock($resource);
-        $lock->setAttributes([
-            'locked_at' => new Expression('NOW()')
-        ]);
-
+        $lock = $classLock::findOrCreate($resource);
+        $lock->deactivate();
         if (!$lock->save()) {
             throw new \RuntimeException('Failed to update the object');
         }
-    }
-
-    /**
-     * Create new or return exist lock for resource
-     * @param LockableInterface $resource
-     * @throws InvalidConfigException
-     * @return Lock
-     */
-    public function getResourceLock($resource)
-    {
-        $hash = $resource->getLockHash();
-
-        $lock = Lock::findOne(['hash' => $hash]);
-        if(!$lock instanceof Lock) {
-            $lock = \Yii::createObject(Lock::class);
-            $lock->setAttributes([
-                'hash'      => $hash,
-                'locked_at' => new Expression('NOW()'),
-                'locked_by' => \Yii::$app->getUser()->getId()
-            ]);
-        }
-
-        return $lock;
     }
 
     /**
@@ -118,9 +94,11 @@ class LockManager extends Component implements LockManagerInterface
      */
     public function checkLockActual(LockableInterface $resource, $throw = false)
     {
-        $lock = $this->getResourceLock($resource);
         $active = false;
+        /** @var LockInterface $classLock */
+        $classLock = $this->lockClass;
 
+        $lock = $classLock::findOrCreate($resource);
         if (!$lock->getIsNewRecord()) {
             $active = $this->checkLockAuthor($lock, $throw) && $this->checkLockTime($resource, $lock, $throw);
         } elseif($throw) {
@@ -132,12 +110,12 @@ class LockManager extends Component implements LockManagerInterface
 
     /**
      * Check lock author
-     * @param Lock $lock
+     * @param LockInterface $lock
      * @param boolean $throw
      * @throws LockAnotherUserException
      * @return boolean
      */
-    public function checkLockAuthor(Lock $lock, $throw = false)
+    public function checkLockAuthor(LockInterface $lock, $throw = false)
     {
         $active = \Yii::$app->getUser()->getId() !== $lock->locked_by;
         if ($active && $throw) {
@@ -150,19 +128,16 @@ class LockManager extends Component implements LockManagerInterface
     /**
      * Check actual lock time
      * @param LockableInterface $resource
-     * @param Lock $lock
+     * @param LockInterface $lock
      * @param boolean $throw
      * @throws LockNotExpiredException
      * @return integer
      */
-    public function checkLockTime(LockableInterface $resource, Lock $lock, $throw = false)
+    public function checkLockTime(LockableInterface $resource, LockInterface $lock, $throw = false)
     {
         $lockSeconds = $this->getResourceLockTime($resource);
         $diffExpression = new Expression($this->diffExpressionValue);
-        $diffSeconds = Lock::find()
-            ->select($diffExpression)
-            ->where(['hash' => $lock->getAttribute('hash')])
-            ->scalar();
+        $diffSeconds = $lock->getLockTimeLeft($diffExpression);
 
         if ($diffSeconds > $lockSeconds && $throw) {
             throw new LockNotExpiredException($diffSeconds);

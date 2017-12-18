@@ -24,7 +24,10 @@
     "codeception/specify": "0.4.*"
   },
   "autoload": {
-    "psr-4": { "notamedia\\locker\\": "src" }
+    "psr-4": {
+      "notamedia\\locker\\": "src",
+      "notamedia\\locker\\config": "config"
+    }
   },
   "extra": {
     "bootstrap": "notamedia\\locker\\config\\Bootstrap"
