@@ -113,3 +113,17 @@ For yii2 < 2.0.10 create new migration and use extends
 ```php
 class mxxxxxx_xxxxxx_create_table_lock extends m000000_000000_create_table_lock
 ```
+
+Usage
+-----
+
+Methods:
+* src/rest/LockAction.php - activates lock and returns `204` status code if successful
+* src/rest/UnlockAction.php - deactivates lock and returns `204` status code if successful
+
+Exceptions
+----------
+
+* src/LockAnotherUserException.php - exception if lock set another user, status code `500`
+* src/LockNotExistException.php - exception if lock not exist, status code `500`
+* src/LockNotExpiredException.php - exception if lock actual and its time not expired, status code `500`

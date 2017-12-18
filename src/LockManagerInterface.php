@@ -34,7 +34,6 @@ interface LockManagerInterface
      * @param LockableInterface $resource
      * @throws InvalidConfigException
      * @throws LockAnotherUserException
-     * @throws LockException
      */
     public function activateLock(LockableInterface $resource);
         
@@ -45,7 +44,6 @@ interface LockManagerInterface
      * @throws LockAnotherUserException
      * @throws LockNotExpiredException
      * @throws LockNotExistException
-     * @throws LockException
      */
     public function deactivateLock(LockableInterface $resource);
     
