@@ -3,6 +3,7 @@
   "description": "Yii2 Locker Extension",
   "keywords": ["yii2", "lock", "locker"],
   "type": "yii2-extension",
+  "license": "MIT",
   "authors": [
     {
       "name": "Alexey Stepankov",
@@ -26,7 +27,7 @@
   "autoload": {
     "psr-4": {
       "notamedia\\locker\\": "src",
-      "notamedia\\locker\\config": "config"
+      "notamedia\\locker\\config\\": "config"
     }
   },
   "extra": {

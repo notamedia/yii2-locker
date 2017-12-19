@@ -10,10 +10,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - `README.md` - `Usage` and `Exceptions` blocks
-- `src/LockInterface` - Lock model interface for custom lock class
-- `src/LockManager.php` - add param `lockClass` for custom lock class
+- `src/LockInterface` - lock model interface for custom lock class
+- `src/LockManager.php` - param `lockClass` for custom lock class
 
-### Added
+### Changed
 
 - Move part logic from `src/LockManager.php` to `src/Lock.php`
 

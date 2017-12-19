@@ -2,7 +2,7 @@
 
 namespace notamedia\locker;
 
-use yii\web\User;
+use yii\web\IdentityInterface;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
@@ -58,7 +58,7 @@ class Lock extends ActiveRecord implements LockInterface
     /**
      * @inheritdoc
      */
-    public static function findOrCreate(LockableInterface $resource)
+    public static function findOrCreate(IdentityInterface $user, LockableInterface $resource)
     {
         $hash = $resource->getLockHash();
         $lock = self::findOne(['hash' => $hash]);
@@ -68,7 +68,7 @@ class Lock extends ActiveRecord implements LockInterface
             $lock->setAttributes([
                 'hash'      => $hash,
                 'locked_at' => new Expression('NOW()'),
-                'locked_by' => \Yii::$app->getUser()->getId()
+                'locked_by' => $user->getId()
             ]);
         }
 
@@ -78,7 +78,7 @@ class Lock extends ActiveRecord implements LockInterface
     /**
      * @inheritdoc
      */
-    public function activate(User $user, Expression $lockedAtExpression)
+    public function activate(IdentityInterface $user, Expression $lockedAtExpression)
     {
         $this->setAttributes([
             'locked_by' => $user->getId(),

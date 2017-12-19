@@ -5,6 +5,8 @@ namespace notamedia\locker;
 use yii\db\Expression;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\base\InvalidValueException;
+use yii\web\IdentityInterface;
 
 /**
  * Resource lock manager
@@ -27,6 +29,7 @@ class LockManager extends Component implements LockManagerInterface
 {
     /** @var string lock time key for default value */
     const DEFAULT_LOCK_TIME_KEY = 'default';
+
     /** @var array lock time in seconds for each record class, key `default` for default value */
     public $lockTime = [
         self::DEFAULT_LOCK_TIME_KEY => 900 // 15 minutes
@@ -49,6 +52,10 @@ class LockManager extends Component implements LockManagerInterface
             throw new InvalidConfigException('Not found correct user component');
         }
 
+        if (!in_array(LockInterface::class, class_implements($this->lockClass))) {
+            throw new InvalidConfigException('Incorrect lockClass value');
+        }
+
         if (!is_array($this->lockTime) || !isset($this->lockTime[self::DEFAULT_LOCK_TIME_KEY])) {
             throw new InvalidConfigException('Incorrect lockTime value');
         }
@@ -61,11 +68,13 @@ class LockManager extends Component implements LockManagerInterface
     {
         /** @var LockInterface $classLock */
         $classLock = $this->lockClass;
-        $lock = $classLock::findOrCreate($resource);
+        $userIdentity = $this->getUserIdentity();
+
+        $lock = $classLock::findOrCreate($userIdentity, $resource);
         $this->checkLockAuthor($lock, true);
 
         $lockSeconds = $this->getResourceLockTime($resource);
-        $lock->activate(\Yii::$app->getUser(), new Expression(sprintf($this->initTimeExpressionValue, $lockSeconds)));
+        $lock->activate($userIdentity, new Expression(sprintf($this->initTimeExpressionValue, $lockSeconds)));
 
         if (!$lock->save()) {
             throw new \RuntimeException('Failed to create or update the object');
@@ -79,11 +88,13 @@ class LockManager extends Component implements LockManagerInterface
     {
         /** @var LockInterface $classLock */
         $classLock = $this->lockClass;
+        $userIdentity = $this->getUserIdentity();
         
         $this->checkLockActual($resource, true);
 
-        $lock = $classLock::findOrCreate($resource);
+        $lock = $classLock::findOrCreate($userIdentity, $resource);
         $lock->deactivate();
+
         if (!$lock->save()) {
             throw new \RuntimeException('Failed to update the object');
         }
@@ -94,18 +105,16 @@ class LockManager extends Component implements LockManagerInterface
      */
     public function checkLockActual(LockableInterface $resource, $throw = false)
     {
-        $active = false;
         /** @var LockInterface $classLock */
         $classLock = $this->lockClass;
+        $userIdentity = $this->getUserIdentity();
 
-        $lock = $classLock::findOrCreate($resource);
-        if (!$lock->getIsNewRecord()) {
-            $active = $this->checkLockAuthor($lock, $throw) && $this->checkLockTime($resource, $lock, $throw);
-        } elseif($throw) {
+        $lock = $classLock::findOrCreate($userIdentity, $resource);
+        if (!$lock->getIsNewRecord() && $throw) {
             throw new LockNotExistException();
         }
 
-        return $active;
+        return $this->checkLockAuthor($lock, $throw) && $this->checkLockTime($resource, $lock, $throw);
     }
 
     /**
@@ -117,7 +126,9 @@ class LockManager extends Component implements LockManagerInterface
      */
     public function checkLockAuthor(LockInterface $lock, $throw = false)
     {
-        $active = \Yii::$app->getUser()->getId() !== $lock->locked_by;
+        $userIdentity = $this->getUserIdentity();
+        $active = $userIdentity->getId() !== $lock->locked_by;
+
         if ($active && $throw) {
             throw new LockAnotherUserException($lock->locked_by);
         }
@@ -135,9 +146,9 @@ class LockManager extends Component implements LockManagerInterface
      */
     public function checkLockTime(LockableInterface $resource, LockInterface $lock, $throw = false)
     {
-        $lockSeconds = $this->getResourceLockTime($resource);
         $diffExpression = new Expression($this->diffExpressionValue);
         $diffSeconds = $lock->getLockTimeLeft($diffExpression);
+        $lockSeconds = $this->getResourceLockTime($resource);
 
         if ($diffSeconds > $lockSeconds && $throw) {
             throw new LockNotExpiredException($diffSeconds);
@@ -156,5 +167,20 @@ class LockManager extends Component implements LockManagerInterface
         $class = get_class($resource);
         return isset($this->lockTime[$class]) ?
             $this->lockTime[$class] : $this->lockTime[self::DEFAULT_LOCK_TIME_KEY];
+    }
+
+    /**
+     * Get user identity
+     * @return IdentityInterface
+     */
+    protected function getUserIdentity()
+    {
+        $user = \Yii::$app->getUser();
+        $userIdentity = $user->getIdentity();
+        if (!$userIdentity instanceof IdentityInterface) {
+            throw new InvalidValueException('The identity object must be IdentityInterface.');
+        }
+
+        return $userIdentity;
     }
 }

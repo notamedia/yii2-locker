@@ -2,7 +2,7 @@
 
 namespace notamedia\locker;
 
-use yii\web\User;
+use yii\web\IdentityInterface;
 use yii\db\ActiveRecordInterface;
 use yii\db\Expression;
 
@@ -26,31 +26,28 @@ use yii\db\Expression;
  *         // set deactivate params
  *     }
  *
- *     public function getDiff();
+ *     public function getLockTimeLeft();
  *     {
  *         // return lock time left
  *     }
  * }
  * ```
- *
- * @property string $hash - hash
- * @property string $locked_at - lock time
- * @property mixed $locked_by - lock author
  */
 interface LockInterface extends ActiveRecordInterface
 {
     /**
      * Get lock
+     * @param IdentityInterface $user
      * @param LockableInterface $resource
      * @return LockInterface
      */
-    public static function findOrCreate(LockableInterface $resource);
+    public static function findOrCreate(IdentityInterface $user, LockableInterface $resource);
     /**
      * Set activate attributes
-     * @param User $user
+     * @param IdentityInterface $user
      * @param Expression $lockedAtExpression
      */
-    public function activate(User $user, Expression $lockedAtExpression);
+    public function activate(IdentityInterface $user, Expression $lockedAtExpression);
     /**
      * Set deactivate attributes
      */
