@@ -53,6 +53,21 @@ return [
 value - time in seconds
 * Note: if your db driver non mysql, you need set custom `'initTimeExpressionValue' = '...'` and 
 `'diffExpressionValue' = '...'`
+* Note: if you want to use custom lock class, you need set new `LockInterface::class` definitions like
+```
+'container' => [
+    '...',
+    'definitions' => [
+        '...',
+        LockInterface::class => function ($container, $params, $config) {
+            list($user, $resource) = $params;
+            return Lock::findOrCreate($user, $resource);
+        }
+        '...'
+    ],
+    '...'
+]
+```
 
 connect following actions in your controllers and configure routing
 

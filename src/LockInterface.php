@@ -36,7 +36,7 @@ use yii\db\Expression;
 interface LockInterface extends ActiveRecordInterface
 {
     /**
-     * Get lock
+     * Get a new or existing lock by hash
      * @param IdentityInterface $user
      * @param LockableInterface $resource
      * @return LockInterface
@@ -53,7 +53,7 @@ interface LockInterface extends ActiveRecordInterface
      */
     public function deactivate();
     /**
-     * Get lock time left
+     * Get the remaining lock time in seconds
      * @param Expression $diffExpression
      * @return int
      */

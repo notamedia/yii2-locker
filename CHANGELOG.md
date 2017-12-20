@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - `README.md` - `Usage` and `Exceptions` blocks
 - `src/LockInterface` - lock model interface for custom lock class
-- `src/LockManager.php` - param `lockClass` for custom lock class
+- Ability to install custom lock class via definitions
 
 ### Changed
 

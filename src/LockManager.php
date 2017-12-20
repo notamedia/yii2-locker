@@ -34,8 +34,6 @@ class LockManager extends Component implements LockManagerInterface
     public $lockTime = [
         self::DEFAULT_LOCK_TIME_KEY => 900 // 15 minutes
     ];
-    /** @var string lock model class */
-    public $lockClass = Lock::class;
     /** @var string expression for add seconds to current date, where %s is a needed seconds */
     public $initTimeExpressionValue = 'DATE_ADD(NOW(), INTERVAL %s SECOND)';
     /** @var string expression for getting past time */
@@ -48,12 +46,18 @@ class LockManager extends Component implements LockManagerInterface
     {
         parent::init();
 
-        if (!\Yii::$app->getUser()) {
-            throw new InvalidConfigException('Not found correct user component');
+        if (!\Yii::$container->has(LockInterface::class)) {
+            \Yii::$container->set(
+                LockInterface::class,
+                function ($container, $params, $config) {
+                    list($user, $resource) = $params;
+                    return Lock::findOrCreate($user, $resource);
+                }
+            );
         }
 
-        if (!in_array(LockInterface::class, class_implements($this->lockClass))) {
-            throw new InvalidConfigException('Incorrect lockClass value');
+        if (!\Yii::$app->getUser()) {
+            throw new InvalidConfigException('Not found correct user component');
         }
 
         if (!is_array($this->lockTime) || !isset($this->lockTime[self::DEFAULT_LOCK_TIME_KEY])) {
@@ -66,11 +70,9 @@ class LockManager extends Component implements LockManagerInterface
      */
     public function activateLock(LockableInterface $resource)
     {
-        /** @var LockInterface $classLock */
-        $classLock = $this->lockClass;
         $userIdentity = $this->getUserIdentity();
-
-        $lock = $classLock::findOrCreate($userIdentity, $resource);
+        /** @var LockInterface $lock */
+        $lock = \Yii::$container->get(LockInterface::class, [$userIdentity, $resource]);
         $this->checkLockAuthor($lock, true);
 
         $lockSeconds = $this->getResourceLockTime($resource);
@@ -86,13 +88,11 @@ class LockManager extends Component implements LockManagerInterface
      */
     public function deactivateLock(LockableInterface $resource)
     {
-        /** @var LockInterface $classLock */
-        $classLock = $this->lockClass;
-        $userIdentity = $this->getUserIdentity();
-        
         $this->checkLockActual($resource, true);
 
-        $lock = $classLock::findOrCreate($userIdentity, $resource);
+        $userIdentity = $this->getUserIdentity();
+        /** @var LockInterface $lock */
+        $lock = \Yii::$container->get(LockInterface::class, [$userIdentity, $resource]);
         $lock->deactivate();
 
         if (!$lock->save()) {
@@ -105,12 +105,10 @@ class LockManager extends Component implements LockManagerInterface
      */
     public function checkLockActual(LockableInterface $resource, $throw = false)
     {
-        /** @var LockInterface $classLock */
-        $classLock = $this->lockClass;
         $userIdentity = $this->getUserIdentity();
-
-        $lock = $classLock::findOrCreate($userIdentity, $resource);
-        if (!$lock->getIsNewRecord() && $throw) {
+        /** @var LockInterface $lock */
+        $lock = \Yii::$container->get(LockInterface::class, [$userIdentity, $resource]);
+        if ($lock->getIsNewRecord() && $throw) {
             throw new LockNotExistException();
         }
 
