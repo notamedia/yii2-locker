@@ -12,7 +12,7 @@ cache:
     - $HOME/.composer/cache
     
 before_install:
-  - composer config --global github-oauth.github.com "$GITHUB_TOKEN"
+  - composer config --global github-oauth.github.com $GITHUB_TOKEN
   
 install:
   - travis_retry composer self-update && composer --version
