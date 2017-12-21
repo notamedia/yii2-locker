@@ -8,30 +8,6 @@ use yii\db\Expression;
 
 /**
  * LockInterface is the interface that should be implemented by a lock model.
- *
- * ```php
- * class Lock extends ActiveRecord implements LockInterface
- * {
- *     public static function findOrCreate(LockableInterface $resource)
- *     {
- *         // get lock
- *     }
- *     public function activate(User $user, Expression $lockedAtExpression);
- *     {
- *         // set activate params
- *     }
- *
- *     public function deactivate();
- *     {
- *         // set deactivate params
- *     }
- *
- *     public function getLockTimeLeft();
- *     {
- *         // return lock time left
- *     }
- * }
- * ```
  */
 interface LockInterface extends ActiveRecordInterface
 {

@@ -5,6 +5,7 @@ namespace tests\unit;
 use yii\web\User;
 use yii\db\Connection;
 use notamedia\locker\LockManager;
+use notamedia\locker\config\Bootstrap;
 
 return [
     'id' => 'app-tests',
@@ -12,6 +13,9 @@ return [
     'basePath' => __DIR__,
     'controllerMap' => [
         'test' => Controller::class,
+    ],
+    'bootstrap' => [
+        Bootstrap::class
     ],
     'components' => [
         'i18n' => [

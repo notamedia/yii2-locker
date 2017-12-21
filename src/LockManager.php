@@ -46,16 +46,6 @@ class LockManager extends Component implements LockManagerInterface
     {
         parent::init();
 
-        if (!\Yii::$container->has(LockInterface::class)) {
-            \Yii::$container->set(
-                LockInterface::class,
-                function ($container, $params, $config) {
-                    list($user, $resource) = $params;
-                    return Lock::findOrCreate($user, $resource);
-                }
-            );
-        }
-
         if (!\Yii::$app->getUser()) {
             throw new InvalidConfigException('Not found correct user component');
         }
