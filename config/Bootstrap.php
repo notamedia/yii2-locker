@@ -41,10 +41,7 @@ class Bootstrap implements BootstrapInterface
         if (!\Yii::$container->has(LockInterface::class)) {
             \Yii::$container->set(
                 LockInterface::class,
-                function ($container, $params, $config) {
-                    list($user, $resource) = $params;
-                    return Lock::findOrCreate($user, $resource);
-                }
+                new Lock()
             );
         }
     }

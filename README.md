@@ -59,10 +59,7 @@ value - time in seconds
     '...',
     'definitions' => [
         '...',
-        LockInterface::class => function ($container, $params, $config) {
-            list($user, $resource) = $params;
-            return Lock::findOrCreate($user, $resource);
-        }
+        LockInterface::class => new Lock()
         '...'
     ],
     '...'
