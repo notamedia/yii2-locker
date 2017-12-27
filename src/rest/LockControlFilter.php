@@ -5,7 +5,6 @@ namespace notamedia\locker\rest;
 use Yii;
 use yii\db\ActiveRecordInterface;
 use yii\di\Instance;
-use yii\rest\Action;
 use yii\base\ActionFilter;
 use yii\base\InvalidConfigException;
 use yii\web\MethodNotAllowedHttpException;
@@ -69,7 +68,7 @@ class LockControlFilter extends ActionFilter
 
     /**
      * @inheritdoc
-     * @param Action $action
+     * @param yii\rest\Action $action
      * @throws NotFoundHttpException
      * @throws InvalidConfigException
      * @throws MethodNotAllowedHttpException
@@ -92,11 +91,11 @@ class LockControlFilter extends ActionFilter
 
     /**
      * Returns the model
-     * @param Action $action
+     * @param yii\rest\Action $action
      * @throws NotFoundHttpException if the model cannot be found
      * @return ActiveRecordInterface the model found
      */
-    public function getModel(Action $action)
+    public function getModel(yii\rest\Action $action)
     {
         if ($this->findModel !== null) {
             return call_user_func($this->findModel, $this);

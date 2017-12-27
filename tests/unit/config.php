@@ -2,7 +2,6 @@
 
 namespace tests\unit;
 
-use yii\web\User;
 use yii\db\Connection;
 use notamedia\locker\LockManager;
 use notamedia\locker\config\Bootstrap;
@@ -32,7 +31,7 @@ return [
             ],
         ],
         'user' => [
-            'class' => User::class,
+            'class' => \yii\web\User::class,
             'identityClass' => \tests\unit\User::class,
         ],
         'db' => [
