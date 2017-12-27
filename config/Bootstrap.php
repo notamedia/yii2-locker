@@ -3,9 +3,11 @@
 namespace notamedia\locker\config;
 
 use yii\base\BootstrapInterface;
+use notamedia\locker\Lock;
+use notamedia\locker\LockInterface;
 
 /**
- * A bootstrapping component as well as an localization initializator.
+ * A bootstrapping component as well as an initializator.
  * The following code shows how you can use this class as a bootstrapping component.
  *
  * ```php
@@ -34,6 +36,13 @@ class Bootstrap implements BootstrapInterface
                     'notamedia/locker/errors' => 'errors.php',
                 ]
             ];
+        }
+
+        if (!\Yii::$container->has(LockInterface::class)) {
+            \Yii::$container->set(
+                LockInterface::class,
+                Lock::class
+            );
         }
     }
 }

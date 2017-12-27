@@ -6,26 +6,6 @@ use yii\base\InvalidConfigException;
 
 /**
  * LockManagerInterface is the interface that should be implemented by a class that manages locks.
- *
- * ```php
- * class LockManager implements LockManagerInterface
- * {
- *     public static function activateLock($resource)
- *     {
- *         // check lock and create or reactivate
- *     }
- *
- *     public static function deactivateLock($resource)
- *     {
- *         // check and deactivate lock
- *     }
- *
- *     public function checkLockActual($resource, $throw = false);
- *     {
- *         // check lock actuality
- *     }
- * }
- * ```
  */
 interface LockManagerInterface
 {

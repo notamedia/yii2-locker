@@ -26,5 +26,4 @@ suites:
                   dump: 'tests/_data/dump.sql'
                   cleanup: true
                 Yii2:
-                  cleanup: true
                   configFile: 'tests/unit/config.php'

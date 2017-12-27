@@ -14,20 +14,21 @@ class LockControlFilterTest extends \Codeception\Test\Unit
     protected function _before()
     {
         parent::_before();
+        \Yii::$app->getUser()->loginByAccessToken(1);
+    }
 
-        /** @var \yii\db\Migration $migration */
-        $migration = \Yii::createObject(\notamedia\locker\migrations\m000000_000000_create_table_lock::class);
-        $migration->up();
-
-        $this->tester->haveFixtures([
+    /**
+     * @inheritdoc
+     */
+    public function _fixtures(){
+        return [
             'model' => [
                 'class' => \tests\_data\fixtures\ModelFixture::class,
             ],
             'lock' => [
                 'class' => \tests\_data\fixtures\LockFixture::class,
             ],
-        ]);
-        \Yii::$app->getUser()->loginByAccessToken(1);
+        ];
     }
 
     /**

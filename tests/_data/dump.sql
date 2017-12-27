@@ -6,3 +6,8 @@ CREATE TABLE `model` (
 );
 
 DROP TABLE IF EXISTS `lock`;
+CREATE TABLE `lock` (
+  `hash` TEXT,
+  `locked_at` TEXT,
+  `locked_by` INTEGER
+);
