@@ -130,12 +130,12 @@ Usage
 -----
 
 Methods:
-* src/rest/LockAction.php - activates lock and returns `204` status code if successful
-* src/rest/UnlockAction.php - deactivates lock and returns `204` status code if successful
+* `LockAction` - activates lock and returns `204` status code if successful
+* `UnlockAction` - deactivates lock and returns `204` status code if successful
 
 Exceptions
 ----------
 
-* src/LockAnotherUserException.php - exception if lock set another user, status code `500`
-* src/LockNotExistException.php - exception if lock not exist, status code `500`
-* src/LockNotExpiredException.php - exception if lock actual and its time not expired, status code `500`
+* `LockAnotherUserException` - exception if lock set another user, status code `500`
+* `LockNotExistException` - exception if lock not exist, status code `500`
+* `LockNotExpiredException` - exception if lock actual and its time not expired, status code `500`
