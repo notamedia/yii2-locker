@@ -59,7 +59,7 @@ value - time in seconds
     '...',
     'definitions' => [
         '...',
-        LockInterface::class => new Lock()
+        LockInterface::class => Lock::class
         '...'
     ],
     '...'
